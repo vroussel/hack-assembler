@@ -16,13 +16,13 @@ void symbol_table_destroy(struct SymbolTable *st) {
     assert(st);
 
     for (int i = 0; i < 1024; i++) {
-        struct Bucket **pp = &(st->buckets[i]);
-        while (*pp) {
-            struct Bucket *b = *pp;
-            pp = &(b->next);
-            free(b);
+        struct Bucket *b = st->buckets[i];
+        while (b) {
+            struct Bucket *current = b;
+            b = current->next;
+            free(current);
         }
-        *pp = NULL;
+        b = NULL;
     }
 }
 
