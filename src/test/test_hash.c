@@ -11,20 +11,6 @@ void tearDown(void) {
     // clean stuff up here
 }
 
-double std_dev(int data[], int N) {
-    long long sum = 0;
-    for (int i = 0; i < N; i++) {
-        sum += data[i];
-    }
-    double avg = sum / (double)N;
-
-    double result = 0;
-    for (int i = 0; i < N; i++) {
-        result += (data[i] - avg) * (data[i] - avg);
-    }
-    return sqrt(result / N);
-}
-
 void random_var_name(int buf_size, char *out) {
     static const char valid_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                       "abcdefghijklmnopqrstuvwxyz"
