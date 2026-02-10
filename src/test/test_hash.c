@@ -1,7 +1,6 @@
 #include "unity.h"
 
 #include "../hash.h"
-#include "unity_internals.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <time.h>
