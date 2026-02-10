@@ -2,13 +2,11 @@
 
 #include "../hash.h"
 #include "unity_internals.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <time.h>
-#include <limits.h>
 
-void setUp(void) {
-    srand(time(0));
-}
+void setUp(void) { srand(time(0)); }
 
 void tearDown(void) {
     // clean stuff up here
@@ -28,12 +26,11 @@ double std_dev(int data[], int N) {
     return sqrt(result / N);
 }
 
-void random_var_name(int buf_size, char* out) {
-    static const char valid_chars[] =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      "abcdefghijklmnopqrstuvwxyz"
-      "1234567890"
-      "_";
+void random_var_name(int buf_size, char *out) {
+    static const char valid_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                      "abcdefghijklmnopqrstuvwxyz"
+                                      "1234567890"
+                                      "_";
     static const int valid_chars_count = sizeof(valid_chars) - 1;
 
     int len = (rand() % (buf_size - 1)) + 1;
@@ -60,8 +57,10 @@ void test_hash_function_distribution(void) {
     double tolerance = 0.5;
     for (int j = 0; j < bucket_count; j++) {
         int bucket_count = buckets[j];
-        TEST_ASSERT_LESS_THAN(expected_avg_bucket_size * (1 + tolerance), bucket_count);
-        TEST_ASSERT_GREATER_THAN(expected_avg_bucket_size * (1 - tolerance), bucket_count);
+        TEST_ASSERT_LESS_THAN(expected_avg_bucket_size * (1 + tolerance),
+                              bucket_count);
+        TEST_ASSERT_GREATER_THAN(expected_avg_bucket_size * (1 - tolerance),
+                                 bucket_count);
     }
 }
 
