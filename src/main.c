@@ -1,10 +1,8 @@
-#include <stdio.h>
 #include <unistd.h>
 
+#include "parsing.h"
 
 int main() {
-    printf("Assembling stuff...\n");
-    sleep(1);
-    printf("Done\n");
-    return 0;
+    int ret = translate(stdin, stdout);
+    return ret;
 }
