@@ -5,7 +5,26 @@
 #include <string.h>
 
 #define MAX_LINE_LENGTH 1024
-struct Instruction {};
+#define MAX_LABEL_LENGTH 128
+
+enum InstructionType {
+    INSTRUCTION_TYPE_LABEL,
+    INSTRUCTION_TYPE_NONE,
+};
+
+struct InstructionLabelFields {
+    char name[MAX_LABEL_LENGTH + 1];
+};
+
+union InstructionFields {
+    struct InstructionLabelFields lbl_fields;
+};
+
+struct Instruction {
+    enum InstructionType type;
+    union InstructionFields fields;
+};
+
 struct ParseLineError {
     int column;
     char error_msg[1024];
