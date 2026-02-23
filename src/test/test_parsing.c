@@ -84,10 +84,45 @@ void test_fgets2(void) {
     fclose(f);
 }
 
+void test_parse_label(void) {
+    struct Instruction instr;
+    struct ParseLineError err;
+    int ret;
+
+    ret = parse_label("()", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(2, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    ret = parse_label("(missingclose", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(14, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    ret = parse_label("(invalich@r", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(10, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    ret = parse_label("(good)", &instr, &err);
+    TEST_ASSERT_EQUAL(0, ret);
+    TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_LABEL, instr.type);
+    TEST_ASSERT_EQUAL_STRING("good", instr.fields.lbl_fields.name);
+
+    ret = parse_label(
+        "(toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+        "oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooolong)",
+        &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(MAX_LABEL_LENGTH + 2, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_parse_line_empty);
     RUN_TEST(test_parse_line_with_comments);
     RUN_TEST(test_fgets2);
+    RUN_TEST(test_parse_label);
     return UNITY_END();
 }

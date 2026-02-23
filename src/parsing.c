@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
 
 #define MAX_LINE_LENGTH 1024
@@ -36,6 +37,54 @@ enum ParseLineResult {
     PLR_ERROR,
 };
 
+int parse_label(const char *line, struct Instruction *instr_out,
+                struct ParseLineError *error_out) {
+    assert(instr_out);
+    assert(error_out);
+
+    const char *c = line;
+    assert(*c == '(');
+
+    instr_out->type = INSTRUCTION_TYPE_LABEL;
+    int label_len = 0;
+
+    int ret = 0;
+    int col = 1;
+    while (*++c != ')') {
+        col++;
+
+        if (*c == '\0') {
+            ret = 1;
+            strncpy(error_out->error_msg, "Missing ')' in symbol declaration",
+                    sizeof(error_out->error_msg));
+            error_out->column = col;
+            break;
+        } else if (label_len == MAX_LABEL_LENGTH) {
+            ret = 1;
+            snprintf(error_out->error_msg, sizeof(error_out->error_msg),
+                     "Label exceeds max length of %d", MAX_LABEL_LENGTH);
+            error_out->column = col;
+            break;
+        } else if (!isalnum(*c) && *c != '_') {
+            ret = 1;
+            strncpy(error_out->error_msg, "Invalid label character",
+                    sizeof(error_out->error_msg));
+            error_out->column = col;
+            break;
+        }
+
+        instr_out->fields.lbl_fields.name[label_len++] = *c;
+    }
+    if (label_len == 0) {
+        ret = 1;
+        strncpy(error_out->error_msg, "Empty label",
+                sizeof(error_out->error_msg));
+        error_out->column = 2;
+    }
+
+    instr_out->fields.lbl_fields.name[label_len++] = '\0';
+    return ret;
+}
 
 enum ParseLineResult parse_line(const char *line, struct Instruction *instr_out,
                                 struct ParseLineError *error_out) {
@@ -55,7 +104,20 @@ enum ParseLineResult parse_line(const char *line, struct Instruction *instr_out,
         return PLR_EMPTY;
     }
 
-    return PLR_ERROR;
+    int instruction_parse_result;
+    switch (*c) {
+    case '(':
+        instruction_parse_result = parse_label(c, instr_out, error_out);
+        break;
+    default:
+        break;
+    };
+
+    if (instruction_parse_result == 0) {
+        return PLR_INSTRUCTION;
+    } else {
+        return PLR_ERROR;
+    }
 }
 
 static char *fgets2(char *s, int size, FILE *stream, bool *truncated) {
