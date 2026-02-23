@@ -5,6 +5,18 @@
 #include <string.h>
 
 #define MAX_LINE_LENGTH 1024
+struct Instruction {};
+struct ParseLineError {
+    int column;
+    char error_msg[1024];
+};
+
+enum ParseLineResult {
+    PLR_INSTRUCTION,
+    PLR_EMPTY,
+    PLR_ERROR,
+};
+
 
 enum ParseLineResult parse_line(const char *line, struct Instruction *instr_out,
                                 struct ParseLineError *error_out) {
