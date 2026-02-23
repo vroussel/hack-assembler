@@ -131,8 +131,14 @@ static char *fgets2(char *s, int size, FILE *stream, bool *truncated) {
     return ret;
 }
 
-int translate(FILE *input, FILE *output) {
+typedef void (*instruction_handler_cb)(void *data,
+                                       const struct Instruction *instr,
+                                       int line_number);
+
+int process_file(FILE *input, instruction_handler_cb instruction_handler,
+                 void *data) {
     int vline = 0;
+    int line = 0;
     struct Instruction instr;
     struct ParseLineError err;
     char buffer[MAX_LINE_LENGTH + 2]; // +2 for \n and \0
@@ -145,7 +151,18 @@ int translate(FILE *input, FILE *output) {
                     MAX_LINE_LENGTH);
             return 1;
         }
-        parse_line(buffer, &instr, &err);
+        enum ParseLineResult ret = parse_line(buffer, &instr, &err);
+        switch (ret) {
+        case PLR_INSTRUCTION:
+            line++;
+            instruction_handler(data, &instr, line);
+            break;
+        case PLR_EMPTY:
+            break;
+        case PLR_ERROR:
+            // TODO print error
+            return 1;
+        }
     }
     if (feof(input)) {
         fputs("EOF has been reached\n", stderr);
@@ -154,5 +171,25 @@ int translate(FILE *input, FILE *output) {
         fputs("Error while reading input\n", stderr);
     }
 
+    return 0;
+}
+
+void fill_symbol_table(struct SymbolTable *st, const struct Instruction *instr,
+                       int line_number) {
+    ;
+}
+
+int translate(FILE *input, FILE *output) {
+    struct SymbolTable st;
+    symbol_table_init(&st);
+
+    int ret =
+        process_file(input, (instruction_handler_cb)(&fill_symbol_table), &st);
+    if (ret != 0) {
+        return ret;
+        symbol_table_destroy(&st);
+    }
+
+    symbol_table_destroy(&st);
     return 0;
 }
