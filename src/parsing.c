@@ -137,25 +137,24 @@ typedef void (*instruction_handler_cb)(void *data,
 
 int process_file(FILE *input, instruction_handler_cb instruction_handler,
                  void *data) {
-    int vline = 0;
-    int line = 0;
+    int visual_line = 1;      // 1 based, used for error reporting
+    int instruction_line = 0; // 0 based, used for labels and such
     struct Instruction instr;
     struct ParseLineError err;
     char buffer[MAX_LINE_LENGTH + 2]; // +2 for \n and \0
     bool truncated;
 
     while (fgets2(buffer, sizeof(buffer), input, &truncated)) {
-        vline++;
         if (truncated) {
-            fprintf(stderr, "Line %d exceeds max line length of %d", vline,
-                    MAX_LINE_LENGTH);
+            fprintf(stderr, "Line %d exceeds max line length of %d",
+                    visual_line, MAX_LINE_LENGTH);
             return 1;
         }
         enum ParseLineResult ret = parse_line(buffer, &instr, &err);
         switch (ret) {
         case PLR_INSTRUCTION:
-            line++;
-            instruction_handler(data, &instr, line);
+            instruction_handler(data, &instr, instruction_line);
+            instruction_line++;
             break;
         case PLR_EMPTY:
             break;
@@ -163,6 +162,7 @@ int process_file(FILE *input, instruction_handler_cb instruction_handler,
             // TODO print error
             return 1;
         }
+        visual_line++;
     }
     if (feof(input)) {
         fputs("EOF has been reached\n", stderr);
