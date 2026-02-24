@@ -6,6 +6,12 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+static FILE *str_to_stream(char *str) {
+    return fmemopen(str, strlen(str), "r");
+}
+
+static FILE *out_stream(size_t size) { return fmemopen(NULL, size, "w"); }
+
 void test_parse_line_empty(void) {
     enum ParseLineResult ret;
     struct Instruction instr;
@@ -36,10 +42,6 @@ void test_parse_line_with_comments(void) {
     // comment with stuff before
     ret = parse_line("stuff // cool", &instr, &err);
     TEST_ASSERT_NOT_EQUAL(PLR_EMPTY, ret);
-}
-
-static FILE *str_to_stream(char *str) {
-    return fmemopen(str, strlen(str), "r");
 }
 
 void test_fgets2(void) {
@@ -118,11 +120,49 @@ void test_parse_label(void) {
     TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
 }
 
+void test_first_pass(void) {
+    FILE *in;
+    struct SymbolTable st;
+    int ret;
+    struct Symbol *s;
+
+    symbol_table_init(&st);
+    in = str_to_stream("(a_great_symbol)");
+    ret = process_file(in, (instruction_handler_cb)(&fill_symbol_table), &st);
+    TEST_ASSERT_EQUAL(0, ret);
+    s = (struct Symbol *)symbol_table_get(&st, "a_great_symbol");
+    TEST_ASSERT_NOT_NULL(s);
+    TEST_ASSERT_EQUAL_STRING("a_great_symbol", s->name);
+    TEST_ASSERT_EQUAL(1, s->address);
+    symbol_table_destroy(&st);
+
+    symbol_table_init(&st);
+    in = str_to_stream(""
+                       "(a_great_symbol)\n"
+                       "// some cool comment\n"
+                       "   //another comment\n"
+                       "@cool\n"
+                       "(a_beautiful_symbol)\n"
+                       "D=1\n");
+    ret = process_file(in, (instruction_handler_cb)(&fill_symbol_table), &st);
+    TEST_ASSERT_EQUAL(0, ret);
+    s = (struct Symbol *)symbol_table_get(&st, "a_great_symbol");
+    TEST_ASSERT_NOT_NULL(s);
+    TEST_ASSERT_EQUAL_STRING("a_great_symbol", s->name);
+    TEST_ASSERT_EQUAL(1, s->address);
+    s = (struct Symbol *)symbol_table_get(&st, "a_beautiful_symbol");
+    TEST_ASSERT_NOT_NULL(s);
+    TEST_ASSERT_EQUAL_STRING("a_beautiful_symbol", s->name);
+    TEST_ASSERT_EQUAL(3, s->address);
+    symbol_table_destroy(&st);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_parse_line_empty);
     RUN_TEST(test_parse_line_with_comments);
     RUN_TEST(test_fgets2);
     RUN_TEST(test_parse_label);
+    RUN_TEST(test_first_pass);
     return UNITY_END();
 }
