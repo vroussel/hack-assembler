@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "symbols.h"
+
 #define MAX_LINE_LENGTH 1024
 #define MAX_LABEL_LENGTH 128
 
@@ -174,9 +176,13 @@ int process_file(FILE *input, instruction_handler_cb instruction_handler,
     return 0;
 }
 
-void fill_symbol_table(struct SymbolTable *st, const struct Instruction *instr,
+void fill_symbol_table(void *data, const struct Instruction *instr,
                        int line_number) {
-    ;
+    struct SymbolTable *st = data;
+    if (instr->type != INSTRUCTION_TYPE_LABEL) {
+        return;
+    }
+    symbol_table_add(st, instr->fields.lbl_fields.name, line_number + 1);
 }
 
 int translate(FILE *input, FILE *output) {
