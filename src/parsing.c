@@ -82,7 +82,7 @@ int parse_label(const char *line, struct Instruction *instr_out,
         error_out->column = 2;
     }
 
-    instr_out->fields.lbl_fields.name[label_len++] = '\0';
+    instr_out->fields.lbl_fields.name[label_len] = '\0';
     return ret;
 }
 
