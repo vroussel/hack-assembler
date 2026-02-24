@@ -186,8 +186,8 @@ int translate(FILE *input, FILE *output) {
     int ret =
         process_file(input, (instruction_handler_cb)(&fill_symbol_table), &st);
     if (ret != 0) {
-        return ret;
         symbol_table_destroy(&st);
+        return ret;
     }
 
     symbol_table_destroy(&st);
