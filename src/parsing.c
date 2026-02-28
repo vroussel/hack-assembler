@@ -197,16 +197,17 @@ void fill_symbol_table(void *data, const struct Instruction *instr,
 }
 
 int translate(FILE *input, FILE *output) {
+    int ret = 0;
     struct SymbolTable st;
     symbol_table_init(&st);
 
-    int ret =
+    ret =
         process_file(input, (instruction_handler_cb)(&fill_symbol_table), &st);
     if (ret != 0) {
-        symbol_table_destroy(&st);
-        return ret;
+        goto cleanup;
     }
 
+cleanup:
     symbol_table_destroy(&st);
-    return 0;
+    return ret;
 }
