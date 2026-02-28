@@ -125,6 +125,42 @@ void test_parse_label(void) {
     TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
 }
 
+void test_parse_a_instruction(void) {
+    struct Instruction instr;
+    struct ParseLineError err;
+    int ret;
+
+    ret = parse_a_instruction("@", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(2, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    ret = parse_a_instruction("@bad-label", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(5, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    ret = parse_a_instruction("@good_label", &instr, &err);
+    TEST_ASSERT_EQUAL(0, ret);
+    TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_A, instr.type);
+    TEST_ASSERT_EQUAL(ADDRESS_TYPE_LABEL, instr.a_fields.type);
+    TEST_ASSERT_EQUAL_STRING("good_label", instr.a_fields.label);
+
+    ret = parse_a_instruction("@123", &instr, &err);
+    TEST_ASSERT_EQUAL(0, ret);
+    TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_A, instr.type);
+    TEST_ASSERT_EQUAL(ADDRESS_TYPE_RAW, instr.a_fields.type);
+    TEST_ASSERT_EQUAL(123, instr.a_fields.raw);
+
+    ret = parse_a_instruction(
+        "@toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+        "oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooolong",
+        &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(MAX_ADDR_LENGTH + 2, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+}
+
 void test_first_pass(void) {
     FILE *in;
     struct SymbolTable st;
@@ -168,6 +204,7 @@ int main(void) {
     RUN_TEST(test_parse_line_with_comments);
     RUN_TEST(test_fgets2);
     RUN_TEST(test_parse_label);
+    RUN_TEST(test_parse_a_instruction);
     RUN_TEST(test_first_pass);
     return UNITY_END();
 }
