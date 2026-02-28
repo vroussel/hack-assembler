@@ -111,6 +111,11 @@ void test_parse_label(void) {
     TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_LABEL, instr.type);
     TEST_ASSERT_EQUAL_STRING("good", instr.lbl_fields.name);
 
+    ret = parse_label("(good)with_trailing_stuff", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(7, err.column);
+    TEST_ASSERT_EQUAL_STRING("good", instr.lbl_fields.name);
+
     ret = parse_label(
         "(toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
         "oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooolong)",
