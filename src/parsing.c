@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "symbols.h"
@@ -19,13 +20,12 @@ struct InstructionLabelFields {
     char name[MAX_LABEL_LENGTH + 1];
 };
 
-union InstructionFields {
-    struct InstructionLabelFields lbl_fields;
-};
-
 struct Instruction {
     enum InstructionType type;
-    union InstructionFields fields;
+    union {
+        struct InstructionLabelFields lbl_fields;
+        struct InstructionAFields a_fields;
+    };
 };
 
 struct ParseLineError {
@@ -47,45 +47,56 @@ int parse_label(const char *line, struct Instruction *instr_out,
     const char *c = line;
     assert(*c == '(');
 
-    instr_out->type = INSTRUCTION_TYPE_LABEL;
     int label_len = 0;
 
-    int ret = 0;
     int col = 1;
-    while (*++c != ')') {
+    char buf[MAX_LABEL_LENGTH];
+    while (true) {
+        c++;
         col++;
 
-        if (*c == '\0') {
-            ret = 1;
+        if (*c == ')') {
+            break;
+        }
+        if (*c == '\0' || *c == '\n') {
             strncpy(error_out->error_msg, "Missing ')' in symbol declaration",
                     sizeof(error_out->error_msg));
             error_out->column = col;
-            break;
+            return 1;
         } else if (label_len == MAX_LABEL_LENGTH) {
-            ret = 1;
             snprintf(error_out->error_msg, sizeof(error_out->error_msg),
                      "Label exceeds max length of %d", MAX_LABEL_LENGTH);
             error_out->column = col;
-            break;
+            return 1;
         } else if (!isalnum(*c) && *c != '_') {
-            ret = 1;
             strncpy(error_out->error_msg, "Invalid label character",
                     sizeof(error_out->error_msg));
             error_out->column = col;
-            break;
+            return 1;
         }
 
-        instr_out->fields.lbl_fields.name[label_len++] = *c;
+        buf[label_len++] = *c;
     }
+    buf[label_len] = '\0';
+
     if (label_len == 0) {
-        ret = 1;
         strncpy(error_out->error_msg, "Empty label",
                 sizeof(error_out->error_msg));
-        error_out->column = 2;
+        error_out->column = col;
+        return 1;
+    } else if (!eol(*++c)) {
+        col++;
+        strncpy(error_out->error_msg,
+                "Unwxpected character after end of symbol ')'",
+                sizeof(error_out->error_msg));
+        error_out->column = col;
+        return 1;
     }
 
-    instr_out->fields.lbl_fields.name[label_len] = '\0';
-    return ret;
+    instr_out->type = INSTRUCTION_TYPE_LABEL;
+    memcpy(instr_out->lbl_fields.name, buf, label_len + 1);
+    return 0;
+}
 }
 
 enum ParseLineResult parse_line(const char *line, struct Instruction *instr_out,
@@ -182,7 +193,7 @@ void fill_symbol_table(void *data, const struct Instruction *instr,
     if (instr->type != INSTRUCTION_TYPE_LABEL) {
         return;
     }
-    symbol_table_add(st, instr->fields.lbl_fields.name, line_number + 1);
+    symbol_table_add(st, instr->lbl_fields.name, line_number + 1);
 }
 
 int translate(FILE *input, FILE *output) {

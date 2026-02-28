@@ -109,7 +109,7 @@ void test_parse_label(void) {
     ret = parse_label("(good)", &instr, &err);
     TEST_ASSERT_EQUAL(0, ret);
     TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_LABEL, instr.type);
-    TEST_ASSERT_EQUAL_STRING("good", instr.fields.lbl_fields.name);
+    TEST_ASSERT_EQUAL_STRING("good", instr.lbl_fields.name);
 
     ret = parse_label(
         "(toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
