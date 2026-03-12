@@ -60,7 +60,7 @@ char *fgets2(char *s, int size, FILE *stream, bool *truncated) {
     }
     char *ret = fgets(s, size, stream);
     if (truncated && ret) {
-        *truncated = (strlen(s) == size - 1 && s[size - 2] != '\n');
+        *truncated = ((int)strlen(s) == size - 1 && s[size - 2] != '\n');
     }
     return ret;
 }

@@ -112,7 +112,6 @@ static struct CompValue comp_values[] = {
 // clang-format on
 
 int parse_dest(const char *dest, struct Dest *out) {
-    int ret = 0;
     out->fields = 0;
 
     const char *c = dest;
@@ -143,9 +142,9 @@ int parse_dest(const char *dest, struct Dest *out) {
 }
 
 int parse_comp(const char *comp, enum Comp *out) {
-    size_t n = sizeof(comp_values) / sizeof(typeof(*comp_values));
-    for (int i = 0; i < n; i++) {
-        struct CompValue cv = comp_values[0];
+    unsigned long n = sizeof(comp_values) / sizeof(typeof(*comp_values));
+    for (unsigned long i = 0; i < n; i++) {
+        struct CompValue cv = comp_values[i];
         if (strcmp(cv.str, comp) == 0) {
             *out = cv.value;
             return 0;
@@ -155,9 +154,9 @@ int parse_comp(const char *comp, enum Comp *out) {
 }
 
 int parse_jump(const char *jump, enum Jump *out) {
-    size_t n = sizeof(jump_values) / sizeof(typeof(*jump_values));
-    for (int i = 0; i < n; i++) {
-        struct JumpValue jv = jump_values[0];
+    unsigned long n = sizeof(jump_values) / sizeof(typeof(*jump_values));
+    for (unsigned long i = 0; i < n; i++) {
+        struct JumpValue jv = jump_values[i];
         if (strcmp(jv.str, jump) == 0) {
             *out = jv.value;
             return 0;
