@@ -183,5 +183,10 @@ int parse_c_instruction(const char *line, struct Instruction *instr_out,
     parse_comp(comp, &c);
     parse_jump(jump, &j);
 
+    instr_out->type = INSTRUCTION_TYPE_C;
+    instr_out->c_fields.jump = j;
+    instr_out->c_fields.comp = c;
+    instr_out->c_fields.dest = d;
+
     return 0;
 }
