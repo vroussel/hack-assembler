@@ -1,3 +1,6 @@
+#ifndef SYMBOLS_H
+#define SYMBOLS_H
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -36,3 +39,4 @@ enum SymbolTableError symbol_table_delete(struct SymbolTable *st,
                                           const char *symbol_name);
 const struct Symbol *symbol_table_get(const struct SymbolTable *st,
                                       const char *symbol_name);
+#endif
