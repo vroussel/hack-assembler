@@ -14,7 +14,6 @@ int parse_a_instruction(const char *line, struct Instruction *instr_out,
     const char *c = line;
     assert(*c == '@');
 
-    instr_out->type = INSTRUCTION_TYPE_A;
     int address_len = 0;
 
     int col = 1;
@@ -54,6 +53,7 @@ int parse_a_instruction(const char *line, struct Instruction *instr_out,
         return 1;
     }
 
+    instr_out->type = INSTRUCTION_TYPE_A;
     instr_out->a_fields.type = addr_type;
     switch (addr_type) {
     case ADDRESS_TYPE_RAW:
