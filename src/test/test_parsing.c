@@ -12,8 +12,6 @@ static FILE *str_to_stream(char *str) {
     return fmemopen(str, strlen(str), "r");
 }
 
-static FILE *out_stream(size_t size) { return fmemopen(NULL, size, "w"); }
-
 void test_parse_line_empty(void) {
     enum ParseLineResult ret;
     struct Instruction instr;
