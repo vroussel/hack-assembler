@@ -9,3 +9,5 @@ add_executable(
     parsing/c_instruction.c
     parsing/label_declaration.c
 )
+
+target_link_libraries(hack-assembler PRIVATE project_warnings)

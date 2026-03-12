@@ -18,4 +18,8 @@ if(BUILD_TESTING)
     target_compile_definitions(unity PUBLIC UNITY_DOUBLE_PRECISION=1e-12)
 endif()
 
+add_library(project_warnings INTERFACE)
+
+target_compile_options(project_warnings INTERFACE -Wall -Wextra)
+
 add_subdirectory(src)
