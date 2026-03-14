@@ -181,9 +181,24 @@ int parse_c_instruction(const char *line, struct Instruction *instr_out,
     struct Dest d;
     enum Comp c;
     enum Jump j;
-    parse_dest(dest, &d);
-    parse_comp(comp, &c);
-    parse_jump(jump, &j);
+    if (parse_dest(dest, &d) != 0) {
+        strncpy(error_out->error_msg, "Invalid dest part",
+                sizeof(error_out->error_msg));
+        error_out->column = dest_begin - line + 1;
+        return 1;
+    }
+    if (parse_comp(comp, &c) != 0) {
+        strncpy(error_out->error_msg, "Invalid comp part",
+                sizeof(error_out->error_msg));
+        error_out->column = comp_begin - line + 1;
+        return 1;
+    }
+    if (parse_jump(jump, &j) != 0) {
+        strncpy(error_out->error_msg, "Invalid jump part",
+                sizeof(error_out->error_msg));
+        error_out->column = jump_begin - line + 1;
+        return 1;
+    }
 
     instr_out->type = INSTRUCTION_TYPE_C;
     instr_out->c_fields.jump = j;
