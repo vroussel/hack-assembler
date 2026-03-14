@@ -156,17 +156,17 @@ int parse_c_instruction(const char *line, struct Instruction *instr_out,
     if (dest_len > MAX_DEST_LENGTH) {
         snprintf(error_out->error_msg, sizeof(error_out->error_msg),
                  "Dest exceeds max length of %d", MAX_DEST_LENGTH);
-        error_out->column = dest_begin + MAX_DEST_LENGTH - line;
+        error_out->column = (dest_begin - line + 1) + MAX_DEST_LENGTH;
         return 1;
     } else if (comp_len > MAX_COMP_LENGTH) {
         snprintf(error_out->error_msg, sizeof(error_out->error_msg),
                  "Comp exceeds max length of %d", MAX_COMP_LENGTH);
-        error_out->column = comp_begin + MAX_COMP_LENGTH - line;
+        error_out->column = (comp_begin - line + 1) + MAX_COMP_LENGTH;
         return 1;
     } else if (jump_len > MAX_JUMP_LENGTH) {
         snprintf(error_out->error_msg, sizeof(error_out->error_msg),
                  "Jump exceeds max length of %d", MAX_JUMP_LENGTH);
-        error_out->column = jump_begin + MAX_JUMP_LENGTH - line;
+        error_out->column = (jump_begin - line + 1) + MAX_JUMP_LENGTH;
         return 1;
     }
 
