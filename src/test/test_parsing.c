@@ -161,6 +161,76 @@ void test_parse_a_instruction(void) {
     TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
 }
 
+void test_parse_c_instruction(void) {
+    struct Instruction instr;
+    struct ParseLineError err;
+    int ret;
+
+    // comp
+    ret = parse_c_instruction("0", &instr, &err);
+    TEST_ASSERT_EQUAL(0, ret);
+    TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_C, instr.type);
+    TEST_ASSERT_EQUAL(COMP_0, instr.c_fields.comp);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.A);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.D);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.M);
+    TEST_ASSERT_EQUAL(JUMP_NULL, instr.c_fields.jump);
+
+    // dest + comp
+    ret = parse_c_instruction("AM=!D", &instr, &err);
+    TEST_ASSERT_EQUAL(0, ret);
+    TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_C, instr.type);
+    TEST_ASSERT_EQUAL(COMP_NOT_D, instr.c_fields.comp);
+    TEST_ASSERT_EQUAL(1, instr.c_fields.dest.A);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.D);
+    TEST_ASSERT_EQUAL(1, instr.c_fields.dest.M);
+    TEST_ASSERT_EQUAL(JUMP_NULL, instr.c_fields.jump);
+
+    // dest + comp + jump
+    ret = parse_c_instruction("MD=D&A;JMP", &instr, &err);
+    TEST_ASSERT_EQUAL(0, ret);
+    TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_C, instr.type);
+    TEST_ASSERT_EQUAL(COMP_D_AND_A, instr.c_fields.comp);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.A);
+    TEST_ASSERT_EQUAL(1, instr.c_fields.dest.D);
+    TEST_ASSERT_EQUAL(1, instr.c_fields.dest.M);
+    TEST_ASSERT_EQUAL(JUMP_JMP, instr.c_fields.jump);
+
+    // comp + jump
+    ret = parse_c_instruction("A+1;JGE", &instr, &err);
+    TEST_ASSERT_EQUAL(0, ret);
+    TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_C, instr.type);
+    TEST_ASSERT_EQUAL(COMP_A_PLUS_1, instr.c_fields.comp);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.A);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.D);
+    TEST_ASSERT_EQUAL(0, instr.c_fields.dest.M);
+    TEST_ASSERT_EQUAL(JUMP_JGE, instr.c_fields.jump);
+
+    // extra ; at end end
+    ret = parse_c_instruction("MD=D&A;JMP;", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(11, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    // Invalid dest
+    ret = parse_c_instruction("OMD=D&A;JMP", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(1, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    // Invalid comp
+    ret = parse_c_instruction("MD=D&D;JMP", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(4, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+
+    // Invalid jump
+    ret = parse_c_instruction("MD=D&A;JNP", &instr, &err);
+    TEST_ASSERT_EQUAL(1, ret);
+    TEST_ASSERT_EQUAL(8, err.column);
+    TEST_ASSERT_GREATER_THAN(0, strlen(err.error_msg));
+}
+
 // TODO This should probably not be part of parsing tests
 // Parsing does not know about symbol table and such
 
@@ -206,6 +276,7 @@ int main(void) {
     RUN_TEST(test_fgets2);
     RUN_TEST(test_parse_label);
     RUN_TEST(test_parse_a_instruction);
+    RUN_TEST(test_parse_c_instruction);
     // RUN_TEST(test_first_pass);
     return UNITY_END();
 }
