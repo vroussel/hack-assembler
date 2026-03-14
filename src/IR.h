@@ -1,12 +1,5 @@
-#ifndef PARSING_INTERNAL_H
-#define PARSING_INTERNAL_H
-
-#include <stdbool.h>
 #include <stdint.h>
 
-#include "parsing.h"
-
-#define MAX_LINE_LENGTH 1024
 #define MAX_LABEL_LENGTH 128
 #define MAX_ADDR_LENGTH MAX_LABEL_LENGTH
 #define MAX_DEST_LENGTH 3
@@ -82,6 +75,12 @@ struct InstructionCFields {
     struct Dest dest;
 };
 
+enum InstructionType {
+    INSTRUCTION_TYPE_A,
+    INSTRUCTION_TYPE_C,
+    INSTRUCTION_TYPE_LABEL,
+};
+
 struct Instruction {
     enum InstructionType type;
     union {
@@ -90,29 +89,3 @@ struct Instruction {
         struct InstructionCFields c_fields;
     };
 };
-
-struct ParseLineError {
-    int column;
-    char error_msg[1024];
-};
-
-enum ParseLineResult {
-    PLR_INSTRUCTION,
-    PLR_EMPTY,
-    PLR_ERROR,
-};
-
-bool eol(const char c);
-int parse_label(const char *line, struct Instruction *instr_out,
-                struct ParseLineError *error_out);
-int parse_a_instruction(const char *line, struct Instruction *instr_out,
-                        struct ParseLineError *error_out);
-int parse_c_instruction(const char *line, struct Instruction *instr_out,
-                        struct ParseLineError *error_out);
-
-enum ParseLineResult parse_line(const char *line, struct Instruction *instr_out,
-                                struct ParseLineError *error_out);
-
-char *fgets2(char *s, int size, FILE *stream, bool *truncated);
-
-#endif

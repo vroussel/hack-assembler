@@ -1,20 +1,12 @@
 #include "parsing.h"
-#include "internal.h"
 
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
 
+#define MAX_LINE_LENGTH 1024
+
 bool eol(const char c) { return c == '\0' || c == '\n'; }
-
-enum InstructionType instruction_type(const struct Instruction *instr) {
-    return instr->type;
-}
-
-const char *instruction_label_name(const struct Instruction *instr) {
-    assert(instr->type == INSTRUCTION_TYPE_LABEL);
-    return instr->lbl_fields.name;
-}
 
 enum ParseLineResult parse_line(const char *line, struct Instruction *instr_out,
                                 struct ParseLineError *error_out) {

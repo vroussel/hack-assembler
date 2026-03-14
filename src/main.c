@@ -7,10 +7,10 @@
 void fill_symbol_table(void *data, const struct Instruction *instr,
                        int line_number) {
     struct SymbolTable *st = data;
-    if (instruction_type(instr) != INSTRUCTION_TYPE_LABEL) {
+    if (instr->type != INSTRUCTION_TYPE_LABEL) {
         return;
     }
-    symbol_table_add(st, instruction_label_name(instr), line_number + 1);
+    symbol_table_add(st, instr->lbl_fields.name, line_number + 1);
 }
 
 int translate(FILE *input, FILE *output) {
