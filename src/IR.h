@@ -24,7 +24,9 @@ struct InstructionAFields {
 };
 
 struct Dest {
-    uint8_t fields;
+    uint8_t A : 1;
+    uint8_t D : 1;
+    uint8_t M : 1;
 };
 
 enum Jump {

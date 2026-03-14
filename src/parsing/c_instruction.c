@@ -5,10 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DEST_A 0x1
-#define DEST_D 0x2
-#define DEST_M 0x4
-
 struct JumpValue {
     const char *str;
     enum Jump value;
@@ -66,28 +62,34 @@ static struct CompValue comp_values[] = {
 // clang-format on
 
 int parse_dest(const char *dest, struct Dest *out) {
-    out->fields = 0;
+    memset(out, 0, sizeof(*out));
 
     const char *c = dest;
     while (*c) {
-        uint8_t bitmask;
         switch (*c) {
         case 'A':
-            bitmask = DEST_A;
+            if (out->A) {
+                return 1;
+            } else {
+                out->A = 1;
+            }
             break;
         case 'D':
-            bitmask = DEST_D;
+            if (out->D) {
+                return 1;
+            } else {
+                out->D = 1;
+            }
             break;
         case 'M':
-            bitmask = DEST_M;
+            if (out->M) {
+                return 1;
+            } else {
+                out->M = 1;
+            }
             break;
         default:
             return 1;
-        }
-        if (out->fields & bitmask) {
-            return 1;
-        } else {
-            out->fields |= bitmask;
         }
         c++;
     }
