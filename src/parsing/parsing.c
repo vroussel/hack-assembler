@@ -90,6 +90,7 @@ int process_file(FILE *input, instruction_handler_cb instruction_handler,
     }
     if (ferror(input)) {
         fputs("Error while reading input\n", stderr);
+        return 1;
     }
 
     return 0;
