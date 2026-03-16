@@ -88,9 +88,6 @@ int process_file(FILE *input, instruction_handler_cb instruction_handler,
         }
         visual_line++;
     }
-    if (feof(input)) {
-        fputs("EOF has been reached\n", stderr);
-    }
     if (ferror(input)) {
         fputs("Error while reading input\n", stderr);
     }
