@@ -46,10 +46,18 @@ void test_add_symbol_twice(void) {
     symbol_table_destroy(&st);
 }
 
+void test_builtin_symbol(void) {
+    struct SymbolTable st;
+    symbol_table_init(&st);
+    TEST_ASSERT_EQUAL(16384, symbol_table_get_or_create(&st, "SCREEN"));
+    symbol_table_destroy(&st);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_get_existing_symbol);
     RUN_TEST(test_get_non_existing_symbol);
     RUN_TEST(test_add_symbol_twice);
+    RUN_TEST(test_builtin_symbol);
     return UNITY_END();
 }

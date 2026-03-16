@@ -6,11 +6,25 @@
 #include "hash.h"
 #include "symbols.h"
 
+static const struct Symbol builtin_symbols[] = {
+    {"R0", 0},   {"R1", 1},         {"R2", 2},     {"R3", 3},   {"R4", 4},
+    {"R5", 5},   {"R6", 6},         {"R7", 7},     {"R8", 8},   {"R9", 9},
+    {"R10", 10}, {"R11", 11},       {"R12", 12},   {"R13", 13}, {"R14", 14},
+    {"R15", 15}, {"SP", 0},         {"LCL", 1},    {"ARG", 2},  {"THIS", 3},
+    {"THAT", 4}, {"SCREEN", 16384}, {"KBD", 24576}};
+
+static size_t builtin_symbols_n =
+    sizeof(builtin_symbols) / sizeof(builtin_symbols[0]);
+
 void symbol_table_init(struct SymbolTable *st) {
     assert(st);
 
     memset(st->buckets, 0, BUCKET_COUNT * sizeof(struct Bucket *));
     st->next_var_address = 16;
+    for (size_t i = 0; i < builtin_symbols_n; i++) {
+        const struct Symbol s = builtin_symbols[i];
+        symbol_table_add(st, s.name, s.address);
+    }
 }
 
 void symbol_table_destroy(struct SymbolTable *st) {
