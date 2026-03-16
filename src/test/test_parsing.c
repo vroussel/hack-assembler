@@ -143,14 +143,14 @@ void test_parse_a_instruction(void) {
     ret = parse_a_instruction("@good_label", &instr, &err);
     TEST_ASSERT_EQUAL(0, ret);
     TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_A, instr.type);
-    TEST_ASSERT_EQUAL(ADDRESS_TYPE_LABEL, instr.a_fields.type);
-    TEST_ASSERT_EQUAL_STRING("good_label", instr.a_fields.label);
+    TEST_ASSERT_FALSE(instr.a_fields.resolved);
+    TEST_ASSERT_EQUAL_STRING("good_label", instr.a_fields.symbol);
 
     ret = parse_a_instruction("@123", &instr, &err);
     TEST_ASSERT_EQUAL(0, ret);
     TEST_ASSERT_EQUAL(INSTRUCTION_TYPE_A, instr.type);
-    TEST_ASSERT_EQUAL(ADDRESS_TYPE_RAW, instr.a_fields.type);
-    TEST_ASSERT_EQUAL(123, instr.a_fields.raw);
+    TEST_ASSERT_TRUE(instr.a_fields.resolved);
+    TEST_ASSERT_EQUAL(123, instr.a_fields.address);
 
     ret = parse_a_instruction(
         "@toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"

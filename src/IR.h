@@ -20,10 +20,10 @@ enum AddressType {
 };
 
 struct InstructionAFields {
-    enum AddressType type;
+    bool resolved;
     union {
-        char label[MAX_LABEL_LENGTH + 1];
-        uint16_t raw;
+        char symbol[MAX_LABEL_LENGTH + 1];
+        uint16_t address;
     };
 };
 
