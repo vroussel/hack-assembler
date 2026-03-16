@@ -10,6 +10,7 @@ void symbol_table_init(struct SymbolTable *st) {
     assert(st);
 
     memset(st->buckets, 0, BUCKET_COUNT * sizeof(struct Bucket *));
+    st->next_var_address = 16;
 }
 
 void symbol_table_destroy(struct SymbolTable *st) {
@@ -82,8 +83,8 @@ enum SymbolTableError symbol_table_delete(struct SymbolTable *st,
     return ST_OK;
 }
 
-const struct Symbol *symbol_table_get(const struct SymbolTable *st,
-                                      const char *symbol_name) {
+uint16_t symbol_table_get_or_create(struct SymbolTable *st,
+                                    const char *symbol_name) {
     assert(st);
     assert(symbol_name);
 
@@ -91,9 +92,12 @@ const struct Symbol *symbol_table_get(const struct SymbolTable *st,
     struct Bucket *b = st->buckets[h];
     while (b) {
         if (strcmp(b->symbol.name, symbol_name) == 0) {
-            return &b->symbol;
+            return b->symbol.address;
         }
         b = b->next;
     }
-    return NULL;
+
+    const uint16_t addr = st->next_var_address++;
+    symbol_table_add(st, symbol_name, addr);
+    return addr;
 }

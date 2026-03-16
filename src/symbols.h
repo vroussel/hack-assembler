@@ -21,6 +21,7 @@ struct Bucket {
 
 struct SymbolTable {
     struct Bucket *buckets[BUCKET_COUNT];
+    uint16_t next_var_address;
 };
 
 enum SymbolTableError {
@@ -37,6 +38,6 @@ enum SymbolTableError symbol_table_add(struct SymbolTable *st,
                                        uint16_t address);
 enum SymbolTableError symbol_table_delete(struct SymbolTable *st,
                                           const char *symbol_name);
-const struct Symbol *symbol_table_get(const struct SymbolTable *st,
-                                      const char *symbol_name);
+uint16_t symbol_table_get_or_create(struct SymbolTable *st,
+                                    const char *symbol_name);
 #endif

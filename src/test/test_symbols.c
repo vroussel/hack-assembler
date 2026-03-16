@@ -11,13 +11,10 @@ void test_get_existing_symbol(void) {
     symbol_table_init(&st);
     enum SymbolTableError result;
 
-    result = symbol_table_add(&st, "super", 0x42);
+    result = symbol_table_add(&st, "super", 42);
     TEST_ASSERT_EQUAL(ST_OK, result);
 
-    const struct Symbol *s = symbol_table_get(&st, "super");
-    TEST_ASSERT_NOT_NULL(s);
-    TEST_ASSERT_EQUAL_STRING("super", s->name);
-    TEST_ASSERT_EQUAL(0x42, s->address);
+    TEST_ASSERT_EQUAL(42, symbol_table_get_or_create(&st, "super"));
 
     symbol_table_destroy(&st);
 }
@@ -26,8 +23,9 @@ void test_get_non_existing_symbol(void) {
     struct SymbolTable st;
     symbol_table_init(&st);
 
-    const struct Symbol *s = symbol_table_get(&st, "nope");
-    TEST_ASSERT_NULL(s);
+    TEST_ASSERT_EQUAL(16, symbol_table_get_or_create(&st, "var1"));
+    TEST_ASSERT_EQUAL(17, symbol_table_get_or_create(&st, "var2"));
+    TEST_ASSERT_EQUAL(18, symbol_table_get_or_create(&st, "var3"));
 
     symbol_table_destroy(&st);
 }
@@ -37,16 +35,13 @@ void test_add_symbol_twice(void) {
     symbol_table_init(&st);
     enum SymbolTableError result;
 
-    result = symbol_table_add(&st, "dup", 0x42);
+    result = symbol_table_add(&st, "dup", 42);
     TEST_ASSERT_EQUAL(ST_OK, result);
 
     result = symbol_table_add(&st, "dup", 0x43);
     TEST_ASSERT_EQUAL(ST_SYMBOL_ALREADY_EXISTS, result);
 
-    const struct Symbol *s = symbol_table_get(&st, "dup");
-    TEST_ASSERT_NOT_NULL(s);
-    TEST_ASSERT_EQUAL_STRING("dup", s->name);
-    TEST_ASSERT_EQUAL(0x42, s->address);
+    TEST_ASSERT_EQUAL(42, symbol_table_get_or_create(&st, "dup"));
 
     symbol_table_destroy(&st);
 }
