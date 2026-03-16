@@ -60,7 +60,7 @@ char *fgets2(char *s, int size, FILE *stream, bool *truncated) {
 int process_file(FILE *input, instruction_handler_cb instruction_handler,
                  void *data) {
     int visual_line = 1;      // 1 based, used for error reporting
-    int instruction_line = 0; // 0 based, used for labels and such
+    int instruction_line = 0; // 0 based, used for "real" instructions
     struct Instruction instr;
     struct ParseLineError err;
     char buffer[MAX_LINE_LENGTH + 2]; // +2 for \n and \0
@@ -76,7 +76,9 @@ int process_file(FILE *input, instruction_handler_cb instruction_handler,
         switch (ret) {
         case PLR_INSTRUCTION:
             instruction_handler(data, &instr, instruction_line);
-            instruction_line++;
+            if (!is_pseudo_instruction(&instr)) {
+                instruction_line++;
+            }
             break;
         case PLR_EMPTY:
             break;

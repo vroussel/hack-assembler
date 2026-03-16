@@ -1,3 +1,7 @@
+#ifndef IR_H
+#define IR_H
+
+#include <stdbool.h>
 #include <stdint.h>
 
 #define MAX_LABEL_LENGTH 128
@@ -91,3 +95,9 @@ struct Instruction {
         struct InstructionCFields c_fields;
     };
 };
+
+static inline bool is_pseudo_instruction(const struct Instruction *instr) {
+    return instr->type == INSTRUCTION_TYPE_LABEL;
+}
+
+#endif
