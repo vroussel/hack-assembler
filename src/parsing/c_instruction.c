@@ -178,8 +178,11 @@ int parse_c_instruction(const char *line, struct Instruction *instr_out,
     char jump[MAX_JUMP_LENGTH + 1];
 
     memcpy(dest, dest_begin, dest_len);
+    dest[dest_len] = '\0';
     memcpy(comp, comp_begin, comp_len);
+    comp[comp_len] = '\0';
     memcpy(jump, jump_begin, jump_len);
+    jump[jump_len] = '\0';
 
     struct Dest d;
     enum Comp c;
