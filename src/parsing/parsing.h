@@ -17,9 +17,8 @@ enum ParseLineResult {
     PLR_ERROR,
 };
 
-typedef void (*instruction_handler_cb)(void *data,
-                                       const struct Instruction *instr,
-                                       int line_number);
+typedef void (*instruction_handler_cb)(struct Instruction *instr,
+                                       int line_number, void *data);
 
 bool eol(const char c);
 

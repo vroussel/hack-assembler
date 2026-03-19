@@ -75,7 +75,7 @@ int process_file(FILE *input, instruction_handler_cb instruction_handler,
         enum ParseLineResult ret = parse_line(buffer, &instr, &err);
         switch (ret) {
         case PLR_INSTRUCTION:
-            instruction_handler(data, &instr, instruction_line);
+            instruction_handler(&instr, instruction_line, data);
             if (!is_pseudo_instruction(&instr)) {
                 instruction_line++;
             }

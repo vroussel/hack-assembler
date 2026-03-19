@@ -4,8 +4,8 @@
 #include "parsing/parsing.h"
 #include "symbols.h"
 
-void fill_symbol_table(void *data, const struct Instruction *instr,
-                       int line_number) {
+void fill_symbol_table_cb(struct Instruction *instr, int line_number,
+                          void *data) {
     struct SymbolTable *st = data;
     if (instr->type != INSTRUCTION_TYPE_LABEL) {
         return;
@@ -18,8 +18,8 @@ int translate(FILE *input, FILE *output) {
     struct SymbolTable st;
     symbol_table_init(&st);
 
-    ret =
-        process_file(input, (instruction_handler_cb)(&fill_symbol_table), &st);
+    ret = process_file(input, (instruction_handler_cb)(&fill_symbol_table_cb),
+                       &st);
     if (ret != 0) {
         goto cleanup;
     }
