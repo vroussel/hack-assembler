@@ -127,6 +127,9 @@ int parse_c_instruction(const char *line, struct Instruction *instr_out,
     assert(error_out);
 
     int line_len = strlen(line);
+    if (line_len > 0 && line[line_len - 1] == '\n') {
+        line_len--;
+    }
 
     const char *dest_begin = NULL;
     const char *comp_begin = NULL;
@@ -174,9 +177,9 @@ int parse_c_instruction(const char *line, struct Instruction *instr_out,
     char comp[MAX_COMP_LENGTH + 1];
     char jump[MAX_JUMP_LENGTH + 1];
 
-    strncpy(dest, dest_begin, dest_len);
-    strncpy(comp, comp_begin, comp_len);
-    strncpy(jump, jump_begin, jump_len);
+    memcpy(dest, dest_begin, dest_len);
+    memcpy(comp, comp_begin, comp_len);
+    memcpy(jump, jump_begin, jump_len);
 
     struct Dest d;
     enum Comp c;
