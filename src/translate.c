@@ -14,7 +14,7 @@ void fill_symbol_table_cb(struct Instruction *instr, int line_number,
     if (instr->type != INSTRUCTION_TYPE_LABEL) {
         return;
     }
-    symbol_table_add(st, instr->lbl_fields.name, line_number + 1);
+    symbol_table_add(st, instr->lbl_fields.name, line_number);
 }
 
 struct EncodeCbData {
