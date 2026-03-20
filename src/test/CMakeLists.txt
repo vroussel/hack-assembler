@@ -32,3 +32,15 @@ add_test(test_encoding test_encoding)
 add_executable(test_utils test_utils.c ../utils.c)
 target_link_libraries(test_utils unity project_warnings)
 add_test(test_utils test_utils)
+
+file(GLOB files "functional/*.asm")
+foreach(asm ${files})
+    get_filename_component(basename ${asm} NAME_WLE)
+    string(REGEX REPLACE "\\.asm$" ".hack.expected" expected ${asm})
+    add_test(
+        NAME ${basename}
+        COMMAND
+            ${CMAKE_CURRENT_SOURCE_DIR}/functional/run.sh
+            $<TARGET_FILE:hack-assembler> ${asm} ${expected}
+    )
+endforeach()
