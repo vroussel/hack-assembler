@@ -28,3 +28,7 @@ add_executable(
 )
 target_link_libraries(test_encoding unity project_warnings)
 add_test(test_encoding test_encoding)
+
+add_executable(test_utils test_utils.c ../utils.c)
+target_link_libraries(test_utils unity project_warnings)
+add_test(test_utils test_utils)
