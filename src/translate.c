@@ -24,6 +24,10 @@ struct EncodeCbData {
 };
 
 void encode_cb(struct Instruction *instr, int line_number, void *data) {
+    if (is_pseudo_instruction(instr)) {
+        return;
+    }
+
     struct EncodeCbData *_data = data;
     uint16_t encoded;
     char buf[16];
