@@ -83,7 +83,8 @@ int process_file(FILE *input, instruction_handler_cb instruction_handler,
         case PLR_EMPTY:
             break;
         case PLR_ERROR:
-            // TODO print error
+            fprintf(stderr, "Error line %d column %d: %s", visual_line,
+                    err.column, err.error_msg);
             return 1;
         }
         visual_line++;
