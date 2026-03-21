@@ -24,6 +24,7 @@ struct EncodeCbData {
 };
 
 void encode_cb(struct Instruction *instr, int line_number, void *data) {
+    (void)line_number;
     if (is_pseudo_instruction(instr)) {
         return;
     }
