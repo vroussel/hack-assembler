@@ -2,6 +2,7 @@
 
 ## Summary
 C implementation of the Hack assembler from [Nand2Tetris](https://www.nand2tetris.org/).
+
 Translates .asm files into .hack machine code.
 
 ## Build and test
